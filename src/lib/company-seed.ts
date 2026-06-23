@@ -2,14 +2,7 @@
 // Called inside a transaction whenever a new company is created.
 // Seeds: 4 roles + permission mappings + 4 default TaskStatuses
 
-import 'dotenv/config'
-import { Pool } from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient, BaseLevel } from '@prisma/client'
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+import { Prisma, BaseLevel } from '@prisma/client'
 
 // Which permission codes each base level gets
 const ROLE_PERMISSIONS: Record<string, string[]> = {
@@ -54,48 +47,46 @@ const BASE_LEVEL_MAP: Record<string, BaseLevel> = {
   viewer:  BaseLevel.VIEWER,
 }
 
-export async function seedNewCompany(companyId: string) {
+export async function seedNewCompany(tx: Prisma.TransactionClient, companyId: string) {
   // Fetch all global permissions upfront
-  const allPermissions = await prisma.permission.findMany()
+  const allPermissions = await tx.permission.findMany()
   const permissionMap = Object.fromEntries(allPermissions.map(p => [p.code, p.id]))
 
-  await prisma.$transaction(async (tx) => {
-    // 1. Seed 4 roles for this company
-    for (const roleName of Object.keys(ROLE_PERMISSIONS)) {
-      const role = await tx.role.create({
-        data: {
-          companyId,
-          name:      roleName,
-          baseLevel: BASE_LEVEL_MAP[roleName],
-        },
-      })
+  // 1. Seed 4 roles for this company
+  for (const roleName of Object.keys(ROLE_PERMISSIONS)) {
+    const role = await tx.role.create({
+      data: {
+        companyId,
+        name:      roleName,
+        baseLevel: BASE_LEVEL_MAP[roleName],
+      },
+    })
 
-      // 2. Attach permissions to this role
-      const codes = ROLE_PERMISSIONS[roleName]
-      for (const code of codes) {
-        const permissionId = permissionMap[code]
-        if (!permissionId) {
-          throw new Error(`Permission code "${code}" not found. Run prisma db seed first.`)
-        }
-        await tx.rolePermission.create({
-          data: {
-            roleId: role.id,
-            permissionId,
-          },
-        })
+    // 2. Attach permissions to this role
+    const codes = ROLE_PERMISSIONS[roleName]
+    for (const code of codes) {
+      const permissionId = permissionMap[code]
+      if (!permissionId) {
+        throw new Error(`Permission code "${code}" not found. Run prisma db seed first.`)
       }
-    }
-
-    // 3. Seed 4 default TaskStatuses for this company
-    for (const status of DEFAULT_TASK_STATUSES) {
-      await tx.taskStatus.create({
+      await tx.rolePermission.create({
         data: {
-          companyId,
-          ...status,
+          roleId: role.id,
+          permissionId,
         },
       })
     }
-  })
+  }
+
+  // 3. Seed 4 default TaskStatuses for this company
+  for (const status of DEFAULT_TASK_STATUSES) {
+    await tx.taskStatus.create({
+      data: {
+        companyId,
+        ...status,
+      },
+    })
+  }
 
   console.log(`✅ Company ${companyId} seeded: roles, permissions, task statuses.`)
 }
