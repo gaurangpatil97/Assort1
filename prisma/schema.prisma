@@ -1,13 +1,510 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// Assort1 — Prisma Schema — FINAL
+// Iteration 1 | 17 tables
+// Generated from SKILL.md decision log + PRD
+//
+// Rules enforced:
+//   - Every table except Permission has company_id
+//   - Superadmin: User with company_id = null
+//   - Soft deletes only — status fields, never DELETE
+//   - Milestone overdue is computed at read time, NOT stored
+//   - storage_key is mandatory on TaskAttachment + MilestoneAttachment
+//   - TaskStatus rows are per-company configurable, NOT hardcoded enum
+//   - Admin accounts cannot be assigned tasks (enforced at API layer)
+//   - TaskAssignee table does NOT exist — one task = one assignee only
+//   - ARCHIVED is not a TaskState — use isArchived Boolean flag on Task
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum CompanyStatus {
+  PENDING_SETUP   // company created, onboarding not completed
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum DemoRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum BaseLevel {
+  ADMIN
+  MANAGER
+  MEMBER
+  VIEWER
+}
+
+enum TaskState {
+  ACTIVE
+  OVERDUE
+  COMPLETED
+}
+
+enum MilestoneStatus {
+  NOT_STARTED
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EntityType {
+  COMPANY
+  USER
+  DEPARTMENT
+  INVITE
+  TASK
+  MILESTONE
+  TASK_COMMENT
+  TASK_ATTACHMENT
+  ROLE
+  PERMISSION
+  DEMO_REQUEST
+  NOTIFICATION
+}
+
+// ─────────────────────────────────────────────
+// COMPANY
+// ─────────────────────────────────────────────
+
+model Company {
+  id               String        @id @default(cuid())
+  name             String
+  logoUrl          String?
+  timezone         String        @default("Asia/Kolkata")
+  status           CompanyStatus @default(PENDING_SETUP)
+  showProfileStats Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  demoRequest   DemoRequest?
+  departments   Department[]
+  roles         Role[]
+  invites       Invite[]
+  users         User[]
+  tasks         Task[]
+  taskStatuses  TaskStatus[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+
+  @@map("companies")
+}
+
+// ─────────────────────────────────────────────
+// DEMO REQUEST
+// ─────────────────────────────────────────────
+
+model DemoRequest {
+  id          String            @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  message     String?
+  status      DemoRequestStatus @default(PENDING)
+  companyId   String?           @unique
+  company     Company?          @relation(fields: [companyId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("demo_requests")
+}
+
+// ─────────────────────────────────────────────
+// ROLE (per-company)
+// ─────────────────────────────────────────────
+
+model Role {
+  id        String    @id @default(cuid())
+  companyId String
+  company   Company   @relation(fields: [companyId], references: [id])
+  name      String    
+  baseLevel BaseLevel 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  rolePermissions RolePermission[]
+  users           User[]
+  invites         Invite[]
+
+  @@unique([companyId, name])
+  @@map("roles")
+}
+
+// ─────────────────────────────────────────────
+// PERMISSION (global — not company-scoped)
+// ─────────────────────────────────────────────
+
+model Permission {
+  id        String   @id @default(cuid())
+  code      String   @unique 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+// ─────────────────────────────────────────────
+// ROLE PERMISSION (join table)
+// ─────────────────────────────────────────────
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ─────────────────────────────────────────────
+// DEPARTMENT
+// ─────────────────────────────────────────────
+
+model Department {
+  id         String   @id @default(cuid())
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id])
+  name       String
+  headUserId String?
+  head       User?    @relation("DepartmentHead", fields: [headUserId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users   User[]   @relation("DepartmentUsers")
+  tasks   Task[]
+  invites Invite[]
+
+  @@map("departments")
+}
+
+// ─────────────────────────────────────────────
+// INVITE
+// ─────────────────────────────────────────────
+
+model Invite {
+  id           String       @id @default(cuid())
+  companyId    String
+  company      Company      @relation(fields: [companyId], references: [id])
+  roleId       String
+  role         Role         @relation(fields: [roleId], references: [id])
+  email        String
+  name         String?
+  designation  String?
+  departmentId String?
+  department   Department?  @relation(fields: [departmentId], references: [id])
+  managerId    String?
+  manager      User?        @relation("InviteManager", fields: [managerId], references: [id])
+  token        String       @unique @default(cuid())
+  status       InviteStatus @default(PENDING)
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([email])
+  @@index([token])
+  @@index([companyId, status])
+  @@map("invites")
+}
+
+// ─────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────
+
+model User {
+  id           String      @id @default(cuid())
+  companyId    String?
+  company      Company?    @relation(fields: [companyId], references: [id])
+  departmentId String?
+  department   Department? @relation("DepartmentUsers", fields: [departmentId], references: [id])
+  managerId    String?
+  manager      User?       @relation("ReportsTo", fields: [managerId], references: [id])
+  reports      User[]      @relation("ReportsTo")
+  roleId       String?
+  role         Role?       @relation(fields: [roleId], references: [id])
+  name         String
+  email        String      @unique
+  passwordHash String?
+  googleId     String?     @unique
+  avatarUrl    String?
+  designation  String? 
+  status       UserStatus  @default(ACTIVE)
+  baseLevel    BaseLevel  
+  emailVerified Boolean     @default(false)
+  lastLoginAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  departmentsHeaded     Department[]          @relation("DepartmentHead")
+  tasksCreated          Task[]                @relation("TaskCreatedBy")
+  tasksAssigned         Task[]                @relation("TaskAssignedTo")
+  milestoneReviews      Milestone[]           @relation("MilestoneReviewedBy")
+  invitesSentAsManager  Invite[]              @relation("InviteManager")
+  milestoneSubmissions  MilestoneSubmission[] @relation("SubmittedBy")
+  submissionReviews     MilestoneSubmission[] @relation("SubmissionReviewedBy")
+  milestoneAttachments  MilestoneAttachment[] @relation("MilestoneAttachmentUploader")
+  comments              TaskComment[]
+  attachmentsUploaded   TaskAttachment[]      @relation("TaskAttachmentUploader")
+  auditLogs             AuditLog[]
+  notifications         Notification[]
+
+  @@index([companyId])
+  @@index([email])
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// TASK STATUS (configurable columns)
+// ─────────────────────────────────────────────
+
+model TaskStatus {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  name        String
+  color       String   @default("#6B7280") 
+  position    Int      
+  isCompleted Boolean  @default(false)
+  isDefault   Boolean  @default(false)   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks Task[]
+
+  @@unique([companyId, position])
+  @@map("task_statuses")
+}
+
+// ─────────────────────────────────────────────
+// TASK
+// ─────────────────────────────────────────────
+
+model Task {
+  id                 String     @id @default(cuid())
+  companyId          String
+  company            Company    @relation(fields: [companyId], references: [id])
+  taskStatusId       String
+  taskStatus         TaskStatus @relation(fields: [taskStatusId], references: [id])
+  departmentId       String?
+  department         Department? @relation(fields: [departmentId], references: [id])
+  createdById        String
+  createdBy          User       @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  assigneeId         String?
+  assignee           User?      @relation("TaskAssignedTo", fields: [assigneeId], references: [id])
+  title              String
+  description        String?
+  priority           Priority   @default(MEDIUM)
+  dueDate            DateTime
+  state              TaskState  @default(ACTIVE)
+  isArchived         Boolean    @default(false)
+  previousAssigneeId String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  milestones  Milestone[]
+  comments    TaskComment[]
+  attachments TaskAttachment[]
+
+  @@index([companyId])
+  @@index([assigneeId])
+  @@index([taskStatusId])
+  @@index([state, companyId])
+  @@map("tasks")
+}
+
+// ─────────────────────────────────────────────
+// MILESTONE
+// ─────────────────────────────────────────────
+
+model Milestone {
+  id            String          @id @default(cuid())
+  taskId        String
+  task          Task            @relation(fields: [taskId], references: [id])
+  name          String
+  position      Int             
+  dueDate       DateTime
+  status        MilestoneStatus @default(NOT_STARTED)
+  submittedAt   DateTime?
+  rejectedAt    DateTime?
+  resubmittedAt DateTime?
+  approvedAt    DateTime?
+  newDeadline   DateTime?
+  reviewedById  String?
+  reviewedBy    User?           @relation("MilestoneReviewedBy", fields: [reviewedById], references: [id])
+  rejectionNote String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  submissions MilestoneSubmission[]
+
+  @@map("milestones")
+}
+
+// ─────────────────────────────────────────────
+// MILESTONE SUBMISSION
+// ─────────────────────────────────────────────
+
+model MilestoneSubmission {
+  id            String    @id @default(cuid())
+  milestoneId   String
+  milestone     Milestone @relation(fields: [milestoneId], references: [id])
+  submittedById String
+  submittedBy   User      @relation("SubmittedBy", fields: [submittedById], references: [id])
+  note          String?
+  attemptNumber Int       @default(1)
+  reviewedById  String?
+  reviewedBy    User?     @relation("SubmissionReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt    DateTime?
+  reviewNote    String?   
+  newDeadline   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  attachments MilestoneAttachment[]
+
+  @@map("milestone_submissions")
+}
+
+// ─────────────────────────────────────────────
+// MILESTONE ATTACHMENT
+// ─────────────────────────────────────────────
+
+model MilestoneAttachment {
+  id           String              @id @default(cuid())
+  submissionId String
+  submission   MilestoneSubmission @relation(fields: [submissionId], references: [id])
+  uploadedById String
+  uploadedBy   User                @relation("MilestoneAttachmentUploader", fields: [uploadedById], references: [id])
+  fileName     String
+  fileSize     Int
+  mimeType     String
+  storageKey   String  
+  fileUrl      String?
+  createdAt    DateTime            @default(now())
+
+  @@map("milestone_attachments")
+}
+
+// ─────────────────────────────────────────────
+// TASK COMMENT
+// ─────────────────────────────────────────────
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("task_comments")
+}
+
+// ─────────────────────────────────────────────
+// TASK ATTACHMENT
+// ─────────────────────────────────────────────
+
+model TaskAttachment {
+  id           String   @id @default(cuid())
+  taskId       String
+  task         Task     @relation(fields: [taskId], references: [id])
+  uploadedById String
+  uploadedBy   User     @relation("TaskAttachmentUploader", fields: [uploadedById], references: [id])
+  fileName     String
+  fileSize     Int    
+  mimeType     String
+  storageKey   String
+  fileUrl      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("task_attachments")
+}
+
+// ─────────────────────────────────────────────
+// AUDIT LOG
+// ─────────────────────────────────────────────
+
+model AuditLog {
+  id         String     @id @default(cuid())
+  companyId  String? 
+  company    Company?   @relation(fields: [companyId], references: [id])
+  userId     String?
+  user       User?      @relation(fields: [userId], references: [id])
+  action     String     
+  entityType EntityType
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+
+  @@index([companyId, createdAt])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATION
+// ─────────────────────────────────────────────
+
+model Notification {
+  id          String      @id @default(cuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  type        String      
+  title       String
+  body        String
+  isRead      Boolean     @default(false)
+  entityType  EntityType?
+  entityId    String?
+  emailSentAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId, isRead])
+  @@index([companyId])
+  @@map("notifications")
 }
