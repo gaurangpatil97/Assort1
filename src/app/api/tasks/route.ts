@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getAuthUser } from '../helper';
+import { getAuthUser } from '@/app/api/helper';
 import { requirePermission } from '@/lib/rbac';
 import { BaseLevel, EntityType, Priority, TaskState, MilestoneStatus } from '@prisma/client';
 import { z } from 'zod';
@@ -80,6 +80,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(formattedTasks);
   } catch (error) {
+    console.error('Task GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

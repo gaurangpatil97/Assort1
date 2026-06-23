@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getAuthUser } from '../../helper';
+import { getAuthUser } from '@/app/api/helper';
 import { requirePermission } from '@/lib/rbac';
 import { requireSameCompany } from '@/lib/tenant';
 import { BaseLevel, EntityType, Priority, TaskState, MilestoneStatus } from '@prisma/client';
