@@ -20,9 +20,7 @@ export default function TaskCreationModal({ onClose, onSuccess }: Props) {
       setStatuses(list);
       if (list.length > 0) setForm(f => ({ ...f, statusId: list[0].id }));
     });
-    fetch('/api/auth/me').then(r => r.json()).then(data => {
-      if (data.departmentId) setForm(f => ({ ...f, departmentId: data.departmentId }));
-    });
+
   }, []);
 
   const handleSubmit = async () => {
@@ -40,7 +38,7 @@ export default function TaskCreationModal({ onClose, onSuccess }: Props) {
           dueDate: new Date(form.dueDate).toISOString(),
           assigneeId: form.assigneeId,
           taskStatusId: form.statusId,
-          departmentId: form.departmentId,
+
         })
       });
       const data = await res.json();

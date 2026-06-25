@@ -209,10 +209,11 @@ export async function POST(request: Request) {
       });
 
       return newTask;
-    });
+    }, { timeout: 30000 });
 
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Task creation error:', JSON.stringify(error, null, 2));
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

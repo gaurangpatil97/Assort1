@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       });
 
       return { company, invite: newInvite };
-    });
+    }, { timeout: 30000 });
     
     const { company, invite } = result;
 
@@ -132,6 +132,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, companyId: company.id }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Company creation error:', error);
+    return NextResponse.json({ error: 'Internal server error', details: String(error) }, { status: 500 });
   }
 }
