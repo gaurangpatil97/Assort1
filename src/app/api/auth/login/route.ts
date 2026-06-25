@@ -48,8 +48,13 @@ export async function POST(request: Request) {
       companyId: user.companyId 
     });
 
-    const response = NextResponse.json({ message: 'Logged in successfully' });
-    response.headers.set('Set-Cookie', `token=${token}; HttpOnly; Path=/; SameSite=Strict; Secure`);
+    const response = NextResponse.json({ 
+      message: 'Logged in successfully',
+      baseLevel: user.baseLevel,
+      companyId: user.companyId
+    });
+    const isProduction = process.env.NODE_ENV === 'production';
+    response.headers.set('Set-Cookie', `token=${token}; HttpOnly; Path=/; SameSite=Strict${isProduction ? '; Secure' : ''}`);
 
     return response;
   } catch (error) {

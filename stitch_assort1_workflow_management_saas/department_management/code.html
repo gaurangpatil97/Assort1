@@ -1,0 +1,419 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Assort1 - Department Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#faf8ff",
+                    "primary-container": "#2563eb",
+                    "on-tertiary-container": "#bdffdb",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container-low": "#f2f3ff",
+                    "surface-container-high": "#e2e7ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "secondary": "#505f76",
+                    "on-surface-variant": "#434655",
+                    "outline-variant": "#c3c6d7",
+                    "on-secondary-fixed": "#0b1c30",
+                    "primary-fixed": "#dbe1ff",
+                    "surface": "#faf8ff",
+                    "secondary-container": "#d0e1fb",
+                    "inverse-on-surface": "#eef0ff",
+                    "tertiary-container": "#007d55",
+                    "on-surface": "#131b2e",
+                    "on-tertiary-fixed": "#002113",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "error-container": "#ffdad6",
+                    "inverse-surface": "#283044",
+                    "surface-variant": "#dae2fd",
+                    "outline": "#737686",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#0053db",
+                    "surface-dim": "#d2d9f4",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "surface-container-highest": "#dae2fd",
+                    "tertiary": "#006242",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-container": "#eaedff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#00174b",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-secondary-container": "#54647a",
+                    "on-primary-container": "#eeefff",
+                    "surface-bright": "#faf8ff",
+                    "on-background": "#131b2e",
+                    "primary": "#004ac6",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "20px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "sidebar_width": "260px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "unit": "4px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "h2": ["Inter"],
+                    "h3": ["Inter"],
+                    "display": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "h1": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            box-shadow: inset 4px 0 0 0 #004ac6; /* Fallback for border-l-4 primary */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SIDEBAR NAVIGATION (Anchored from JSON) -->
+<aside class="fixed h-full w-[260px] left-0 top-0 bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-sm py-lg z-50">
+<div class="px-lg mb-xl">
+<h1 class="font-h2 text-h2 font-bold text-primary">Assort1</h1>
+<p class="text-on-surface-variant font-label-md">Workflow Management</p>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="feedback">feedback</span>
+<span class="font-label-md text-label-md">Demo Requests</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="business">business</span>
+<span class="font-label-md text-label-md">Companies</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg bg-secondary-fixed text-on-secondary-fixed border-l-4 border-primary font-semibold transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-label-md text-label-md">Departments</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="font-label-md text-label-md">Task Statuses</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-md text-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- TOP NAV BAR (Anchored from JSON) -->
+<header class="fixed top-0 right-0 left-[260px] h-16 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center px-lg z-40">
+<div class="flex items-center gap-lg">
+<div class="relative group">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-outline group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary-container outline-none transition-all w-64 lg:w-96" placeholder="Search departments..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-8 w-px bg-outline-variant"></div>
+<button class="flex items-center gap-sm p-1 rounded-full hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-[32px]" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- MAIN CONTENT CANVAS -->
+<main class="ml-[260px] pt-16 min-h-screen">
+<div class="max-w-7xl mx-auto p-lg">
+<!-- HEADER SECTION -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+<div>
+<h2 class="font-h1 text-h1 text-on-surface">Department Management</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm">Organize your enterprise structure and manage divisional leaders.</p>
+</div>
+<button class="flex items-center justify-center gap-sm bg-primary text-on-primary px-xl py-md rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all shadow-md">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                    Create Department
+                </button>
+</section>
+<!-- ANALYTICS / QUICK STATS (Bento Grid Style) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg mb-xl">
+<div class="md:col-span-1 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Total Units</p>
+<p class="font-display text-display text-primary">12</p>
+<div class="mt-md flex items-center text-tertiary font-label-sm">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="trending_up">trending_up</span>
+                        2 new this quarter
+                    </div>
+</div>
+<div class="md:col-span-1 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Cross-Functional</p>
+<p class="font-display text-display text-on-surface">420</p>
+<p class="mt-md text-on-surface-variant font-body-sm">Active employees mapped</p>
+</div>
+<div class="md:col-span-2 relative overflow-hidden bg-primary-container p-lg rounded-xl border border-primary text-on-primary-container">
+<div class="relative z-10">
+
+
+<div class="flex items-center gap-md">
+<div class="flex-1 bg-white/20 h-2 rounded-full overflow-hidden">
+<div class="bg-white h-full w-[94%]"></div>
+</div>
+<span class="font-label-md">94%</span>
+</div>
+</div>
+<!-- Decorative Element -->
+<div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+</div>
+<!-- DEPARTMENTS GRID -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- CARD 1: Engineering -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:shadow-lg hover:border-primary/30 transition-all duration-300 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant">
+<span class="material-symbols-outlined text-[28px]" data-icon="terminal">terminal</span>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface mb-xs group-hover:text-primary transition-colors">Engineering</h3>
+
+</div>
+<div class="pt-lg border-t border-outline-variant/50">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-container-lowest" data-alt="A professional headshot of a senior technology executive with a friendly expression, soft studio lighting, corporate professional style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCqZKcVkZmf-pdZmfSNbnuN56PyRoAHcDufv2GVemCfIk_gBp8fluufWODnduOwZWcaenFOn0erjACec8KvVZE-3UCKh2SJ1GjoaZ4cM6NzWN2wIVYcRgVuZYeZ-0brfD26l64w5c-siyTK4zS7EpV8UQI0B-6eP-4_-opa_-nYs6OFSY2QTYk8__4t7tAnBbADabDlkwvMKnEC2pCbF3hYoRIg2YyNRXrfinrmeHpr3l0gF3w_JhI91X1aX8QvRa9Nr621b5HFEgWH')"></div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Arjun Sharma</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">CTO</p>
+</div>
+</div>
+<div class="bg-tertiary/10 text-tertiary px-sm py-1 rounded-full font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+                                124 Users
+                            </div>
+</div>
+<button class="w-full py-2 bg-surface-container-low text-on-surface-variant rounded-lg font-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-all group-hover:translate-y-0 translate-y-1 opacity-0 group-hover:opacity-100">View Hierarchy</button>
+</div>
+</div>
+<!-- CARD 2: Marketing -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:shadow-lg hover:border-primary/30 transition-all duration-300 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-[28px]" data-icon="campaign">campaign</span>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface mb-xs group-hover:text-primary transition-colors">Marketing</h3>
+
+</div>
+<div class="pt-lg border-t border-outline-variant/50">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-container-lowest" data-alt="Close up portrait of a professional woman with glasses, smiling warmly, soft office background blur, bright lighting, high quality business photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0IBtgNBAH8cM8WDJLfkVbXWimZFTMfEqI6V_muub7eDmoB7Xr7zshF4XNY92o1gL3whyUY60DrLRgkOjOHKkBuedt1sVGgjt0msExX7NPfe0W2kNN8CkJkuTu2YAzv2aO46a7JfQ4mr8E4-quMzfJPfc909bAPrxWwdNoYUOw-sSxnXI_Q36c8R4dGaI4sbwjw87BibOdSdXblYab-mr1ueL6vcdfBW9Iu6OVgIDwaIuOlT9Z1WAIvRZbWjfwW6jfCdz3VwDHtTz1')"></div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Priya Kapur</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">VP Marketing</p>
+</div>
+</div>
+<div class="bg-tertiary/10 text-tertiary px-sm py-1 rounded-full font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+                                48 Users
+                            </div>
+</div>
+<button class="w-full py-2 bg-surface-container-low text-on-surface-variant rounded-lg font-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-all group-hover:translate-y-0 translate-y-1 opacity-0 group-hover:opacity-100">View Hierarchy</button>
+</div>
+</div>
+<!-- CARD 3: Sales -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:shadow-lg hover:border-primary/30 transition-all duration-300 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-[28px]" data-icon="payments">payments</span>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface mb-xs group-hover:text-primary transition-colors">Sales</h3>
+
+</div>
+<div class="pt-lg border-t border-outline-variant/50">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-container-lowest" data-alt="A portrait of a confident male executive in a navy suit, urban boardroom backdrop, natural daylight, corporate leadership aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB-vPjJEnmf8Zv-O5YkEwcF--MDGdXEKwbcVUQYkq1OvSrer02gB0wY4DF1ciFv5WWLKHMQZJ-yeVJRTP7hXlRl1n8y_sCWXBRmw9xoaZLqTTE_4BXDOOciFeW3eYk4dkeiYAhDNenVWALd5ygx6q4ESZSiA8sfTJdYL0yazeVpxOlY331OqQlBdTW8w0Wqc__vDHGJ7pBqwgwjIvqJnrLVF1S7b0uy_STZUzDxFCd8YIcOWDbyZuWUzLdouiBzJvtxa9g7YRWEjJe4')"></div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Rohan Verma</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Director of Sales</p>
+</div>
+</div>
+<div class="bg-tertiary/10 text-tertiary px-sm py-1 rounded-full font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+                                92 Users
+                            </div>
+</div>
+<button class="w-full py-2 bg-surface-container-low text-on-surface-variant rounded-lg font-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-all group-hover:translate-y-0 translate-y-1 opacity-0 group-hover:opacity-100">View Hierarchy</button>
+</div>
+</div>
+<!-- CARD 4: Human Resources -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:shadow-lg hover:border-primary/30 transition-all duration-300 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]" data-icon="diversity_3">diversity_3</span>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface mb-xs group-hover:text-primary transition-colors">Human Resources</h3>
+
+</div>
+<div class="pt-lg border-t border-outline-variant/50">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-container-lowest" data-alt="Portrait of an elegant woman with a confident posture, minimal office background with soft bokeh, sophisticated professional style, warm colors." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtgkPE2uXCA_nuaQDaUQq2VzG3YT-XEFxL2mwoylWlSmZmzlAqprYmXT_X7ZDDzaUAkUWskcScNoYCID4URMQjaa5AVCV9lDbVZRZn2bu_PtNAVtwrSbPpGUPDy3bXbBoMDVJc5YGa6xHFTt53LbKrFHL8vcE9yyRSTvD9FrZUK-6ypW1Brvlrku5S_EPtvXZLpqExBdxrUH7-bjrH-DSzSP3mhewU70mI7zPH5XWgl95thOUKSsLQBkZQNmwM5L9I7WyNJOk7zk1n')"></div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Sneha Reddy</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Head of HR</p>
+</div>
+</div>
+<div class="bg-tertiary/10 text-tertiary px-sm py-1 rounded-full font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+                                12 Users
+                            </div>
+</div>
+<button class="w-full py-2 bg-surface-container-low text-on-surface-variant rounded-lg font-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-all group-hover:translate-y-0 translate-y-1 opacity-0 group-hover:opacity-100">View Hierarchy</button>
+</div>
+</div>
+<!-- CARD 5: Operations -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:shadow-lg hover:border-primary/30 transition-all duration-300 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-outline-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[28px]" data-icon="settings_suggest">settings_suggest</span>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface mb-xs group-hover:text-primary transition-colors">Operations</h3>
+
+</div>
+<div class="pt-lg border-t border-outline-variant/50">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-cover bg-center border-2 border-surface-container-lowest" data-alt="Mature businessman with a sharp look, modern minimalist office setting, morning sunlight, clean corporate atmosphere." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAbP6nNSjaP1LkSR_OOAujHLLUeP-qWuZc_DFHGoqGuujhPH7uH8Nz4yAcsdBOIQvleNroTSwZvz8TsHLh3TkMIm87AdIanoVSWfPDSeLhWVzc7NZTMj5fdnxt9Rs9vWU08nmr-NVTVHRo2rVLO9EhVgLv13O8NpSRzMuioSQf3WPQgxGbrbnTK_bwPCBAVJV1_gIb4w8uG1Z0-vRJ7UCvtzSsQqPupNOtRsetB-vS6hUD2YwD74b2qKOn4mkvoLq__6nVxd--CmsgN')"></div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Amit Patel</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">COO</p>
+</div>
+</div>
+<div class="bg-tertiary/10 text-tertiary px-sm py-1 rounded-full font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+                                65 Users
+                            </div>
+</div>
+<button class="w-full py-2 bg-surface-container-low text-on-surface-variant rounded-lg font-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-all group-hover:translate-y-0 translate-y-1 opacity-0 group-hover:opacity-100">View Hierarchy</button>
+</div>
+</div>
+<!-- EMPTY STATE / CREATE NEW CARD -->
+<div class="group border-2 border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-low transition-all duration-300">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-outline group-hover:text-primary group-hover:scale-110 transition-all mb-md">
+<span class="material-symbols-outlined text-[32px]" data-icon="add_circle">add_circle</span>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface-variant">Add Department</h3>
+<p class="font-body-sm text-body-sm text-outline px-xl">Define a new organizational unit within the system.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- FLOATING ACTION BUTTON (Contextual) -->
+<button class="fixed bottom-lg right-lg w-14 h-14 bg-primary-container text-on-primary-container rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-[32px]" data-icon="chat">chat</span>
+</button>
+<script>
+        // Micro-interaction: Active state hover effects
+        const navItems = document.querySelectorAll('nav a');
+        navItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (!item.classList.contains('bg-secondary-fixed')) {
+                    item.classList.add('translate-x-1');
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                item.classList.remove('translate-x-1');
+            });
+        });
+
+        // Search Bar Focus Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        const searchIcon = searchInput.previousElementSibling.querySelector('span');
+        searchInput.addEventListener('focus', () => {
+            searchIcon.style.fontVariationSettings = "'FILL' 1";
+        });
+        searchInput.addEventListener('blur', () => {
+            searchIcon.style.fontVariationSettings = "'FILL' 0";
+        });
+    </script>
+
+
+</body></html>

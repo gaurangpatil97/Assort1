@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 function getTaskScope(user: { id: string; companyId: string; departmentId: string | null; baseLevel: BaseLevel }) {
   if (user.baseLevel === 'ADMIN') return { companyId: user.companyId };
-  if (user.baseLevel === 'MANAGER') return { companyId: user.companyId, departmentId: user.departmentId };
+  if (user.baseLevel === 'MANAGER') return { companyId: user.companyId };
   return { companyId: user.companyId, assigneeId: user.id };
 }
 
@@ -39,9 +39,6 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
 
     // Apply visibility scope
     const scope = getTaskScope(userOrResponse);
-    if (scope.departmentId && task.departmentId !== scope.departmentId) {
-      return NextResponse.json({ error: 'Task not found in your scope' }, { status: 404 });
-    }
     if (scope.assigneeId && task.assigneeId !== scope.assigneeId) {
       return NextResponse.json({ error: 'Task not found in your scope' }, { status: 404 });
     }

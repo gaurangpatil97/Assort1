@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Assort1 | Submit Milestone</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .blur-bg {
+            backdrop-filter: blur(8px);
+        }
+        .modal-enter {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#faf8ff",
+                        "primary-container": "#2563eb",
+                        "on-tertiary-container": "#bdffdb",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-low": "#f2f3ff",
+                        "surface-container-high": "#e2e7ff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "secondary": "#505f76",
+                        "on-surface-variant": "#434655",
+                        "outline-variant": "#c3c6d7",
+                        "on-secondary-fixed": "#0b1c30",
+                        "primary-fixed": "#dbe1ff",
+                        "surface": "#faf8ff",
+                        "secondary-container": "#d0e1fb",
+                        "inverse-on-surface": "#eef0ff",
+                        "tertiary-container": "#007d55",
+                        "on-surface": "#131b2e",
+                        "on-tertiary-fixed": "#002113",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#283044",
+                        "surface-variant": "#dae2fd",
+                        "outline": "#737686",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#0053db",
+                        "surface-dim": "#d2d9f4",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-highest": "#dae2fd",
+                        "tertiary": "#006242",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container": "#eaedff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#00174b",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-secondary-container": "#54647a",
+                        "on-primary-container": "#eeefff",
+                        "surface-bright": "#faf8ff",
+                        "on-background": "#131b2e",
+                        "primary": "#004ac6",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "20px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "sidebar_width": "260px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "unit": "4px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "h1": ["Inter"], "body-lg": ["Inter"], "h2": ["Inter"], "h3": ["Inter"], "display": ["Inter"], "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "h1": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- Blurred Content Canvas (Task Detail View) -->
+<div class="fixed inset-0 z-0 flex flex-col md:flex-row filter blur-md pointer-events-none scale-[1.02]">
+<!-- SideNavBar Anchor -->
+<aside class="fixed h-full w-sidebar_width left-0 top-0 bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-sm py-lg hidden md:flex">
+<div class="px-lg mb-xl">
+<span class="font-h2 text-h2 font-bold text-primary">Assort1</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Workflow Management</p>
+</div>
+<nav class="flex-1 px-md flex flex-col gap-xs">
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">business</span>
+<span class="font-label-md text-label-md">Companies</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg bg-secondary-fixed text-on-secondary-fixed border-l-4 border-primary-container font-semibold">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Tasks</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content (Blurred Detail View) -->
+<main class="flex-1 ml-0 md:ml-sidebar_width flex flex-col">
+<!-- TopNavBar Anchor -->
+<header class="flex justify-between items-center h-16 px-lg bg-surface border-b border-outline-variant shadow-sm z-10">
+<div class="flex items-center gap-md flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-primary-container outline-none transition-all" placeholder="Search tasks..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">JD</div>
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+</div>
+</header>
+<div class="p-lg flex flex-col gap-lg">
+<!-- Header Breadcrumb -->
+<div class="flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-outline tracking-wider">PROJECT ALPHA &gt; MILESTONE 2</span>
+<h1 class="font-h1 text-h1 text-on-surface">Design Phase Review</h1>
+</div>
+<!-- Fake Task Content for Blurring -->
+<div class="grid grid-cols-12 gap-lg">
+<div class="col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-lg">
+<div class="h-4 w-1/4 bg-surface-container-high rounded"></div>
+<div class="h-32 w-full bg-surface-container-high rounded"></div>
+<div class="grid grid-cols-3 gap-md">
+<div class="h-20 bg-surface-container-high rounded"></div>
+<div class="h-20 bg-surface-container-high rounded"></div>
+<div class="h-20 bg-surface-container-high rounded"></div>
+</div>
+</div>
+<div class="col-span-4 flex flex-col gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg h-48"></div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg h-64"></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 z-[60] bg-on-surface/40 flex items-center justify-center p-md" id="modal-backdrop">
+<!-- Milestone Submission Modal -->
+<div class="modal-enter w-full max-w-[560px] bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden flex flex-col">
+<!-- Modal Header -->
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">assignment_turned_in</span>
+</div>
+<div>
+<h2 class="font-h3 text-h3 text-on-surface leading-tight">Submit Milestone</h2>
+<p class="font-body-sm text-body-sm text-outline">Update progress for the current phase</p>
+</div>
+</div>
+<button class="p-sm hover:bg-surface-container-low rounded-full transition-colors text-outline">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content -->
+<div class="p-lg flex flex-col gap-xl">
+<!-- Milestone Identification -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Milestone Name</label>
+<div class="p-md bg-surface-container-low border border-outline-variant rounded-lg flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-container">flag</span>
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Design Specification Document - v1.2</span>
+</div>
+</div>
+<!-- Submission Note Area -->
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant" for="submission-note">Submission Note</label>
+<span class="font-body-sm text-body-sm text-outline">Optional</span>
+</div>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md font-body-md text-body-md focus:ring-2 focus:ring-primary-container focus:border-primary-container outline-none transition-all resize-none placeholder:text-outline" id="submission-note" placeholder="Add details about your submission, challenges faced, or key changes made..." rows="4"></textarea>
+</div>
+<!-- Drag & Drop Upload Zone -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Supporting Documents</label>
+<div class="border-2 border-dashed border-outline-variant bg-surface-container-low/50 rounded-xl p-xl flex flex-col items-center justify-center gap-md group hover:border-primary-container hover:bg-primary-fixed/20 transition-all cursor-pointer" id="drop-zone">
+<div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[28px]">upload_file</span>
+</div>
+<div class="text-center">
+<p class="font-label-md text-label-md text-on-surface">Click to upload or drag and drop</p>
+<p class="font-body-sm text-body-sm text-outline">PDF, DOCX, JPG or ZIP (Max. 50MB)</p>
+</div>
+<!-- Uploaded File Mockup (Initially Hidden/Interactive) -->
+<div class="hidden w-full max-w-sm mt-md p-sm bg-surface-container-lowest rounded-lg border border-outline-variant flex items-center gap-md" id="file-preview">
+<span class="material-symbols-outlined text-tertiary">task</span>
+<div class="flex-1 min-w-0">
+<p class="font-body-sm text-body-sm font-medium truncate">design_specs_final.pdf</p>
+<p class="text-[10px] text-outline">1.4 MB • Complete</p>
+</div>
+<span class="material-symbols-outlined text-error cursor-pointer hover:scale-110 transition-transform">delete</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-lg py-lg bg-surface-container-low/30 border-t border-outline-variant flex items-center justify-end gap-md">
+<button class="px-xl py-md font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors border border-outline-variant">
+                    Cancel
+                </button>
+<button class="px-xl py-md font-label-md text-label-md bg-primary-container text-on-primary-container rounded-lg shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm" id="submit-btn">
+<span>Submit</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        const dropZone = document.getElementById('drop-zone');
+        const filePreview = document.getElementById('file-preview');
+        const submitBtn = document.getElementById('submit-btn');
+
+        dropZone.addEventListener('click', () => {
+            // Simulate file selection
+            filePreview.classList.toggle('hidden');
+        });
+
+        submitBtn.addEventListener('click', function() {
+            this.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Submitting...</span>
+            `;
+            setTimeout(() => {
+                alert('Milestone Submitted Successfully!');
+                this.innerHTML = '<span>Submit</span><span class="material-symbols-outlined text-[18px]">send</span>';
+            }, 1500);
+        });
+
+        // Simple Drag and Drop visual feedback
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-primary', 'bg-primary-fixed/40');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-primary-fixed/40');
+            }, false);
+        });
+    </script>
+</body></html>

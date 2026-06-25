@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Task Creation - Assort1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#faf8ff",
+                    "primary-container": "#2563eb",
+                    "on-tertiary-container": "#bdffdb",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container-low": "#f2f3ff",
+                    "surface-container-high": "#e2e7ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "secondary": "#505f76",
+                    "on-surface-variant": "#434655",
+                    "outline-variant": "#c3c6d7",
+                    "on-secondary-fixed": "#0b1c30",
+                    "primary-fixed": "#dbe1ff",
+                    "surface": "#faf8ff",
+                    "secondary-container": "#d0e1fb",
+                    "inverse-on-surface": "#eef0ff",
+                    "tertiary-container": "#007d55",
+                    "on-surface": "#131b2e",
+                    "on-tertiary-fixed": "#002113",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "error-container": "#ffdad6",
+                    "inverse-surface": "#283044",
+                    "surface-variant": "#dae2fd",
+                    "outline": "#737686",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#0053db",
+                    "surface-dim": "#d2d9f4",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "surface-container-highest": "#dae2fd",
+                    "tertiary": "#006242",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-container": "#eaedff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#00174b",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-secondary-container": "#54647a",
+                    "on-primary-container": "#eeefff",
+                    "surface-bright": "#faf8ff",
+                    "on-background": "#131b2e",
+                    "primary": "#004ac6",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "20px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "sidebar_width": "260px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "unit": "4px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "h2": ["Inter"],
+                    "h3": ["Inter"],
+                    "display": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "h1": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Modal Backdrop Blur Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden">
+<!-- Persistent Background Mockup (Canvas Context) -->
+<div class="fixed inset-0 flex">
+<!-- Sidebar Shell -->
+<aside class="fixed h-full w-[260px] left-0 top-0 bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-sm py-lg">
+<div class="px-lg mb-xl">
+<h2 class="font-h2 text-h2 font-bold text-primary">Assort1</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Workflow Management</p>
+</div>
+<nav class="flex-1 px-md space-y-1">
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg bg-secondary-fixed text-on-secondary-fixed border-l-4 border-primary-container font-semibold transition-colors duration-200">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Tasks</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[260px] flex-1 flex flex-col">
+<header class="flex justify-between items-center h-16 px-lg bg-surface border-b border-outline-variant sticky top-0 z-10">
+<div class="flex items-center gap-md bg-surface-container-low px-md py-xs rounded-full border border-outline-variant w-96">
+<span class="material-symbols-outlined text-outline">search</span>
+<span class="text-on-surface-variant font-body-md text-body-md">Search tasks...</span>
+</div>
+<div class="flex items-center gap-lg">
+<span class="material-symbols-outlined text-outline">notifications</span>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content Mock -->
+<div class="p-lg">
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h1 class="font-h1 text-h1 text-on-surface">Task Overview</h1>
+<p class="text-on-surface-variant font-body-md">Manage and track your team's productivity</p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md flex items-center gap-sm shadow-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined">add</span>
+                        Create Task
+                    </button>
+</div>
+<div class="grid grid-cols-3 gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm h-64"></div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm h-64"></div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm h-64"></div>
+</div>
+</div>
+</main>
+</div>
+<!-- TASK CREATION MODAL OVERLAY -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-md sm:p-xl animate-fade-in" id="taskModal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-surface/40 backdrop-blur-sm"></div>
+<!-- Modal Content -->
+<div class="relative w-full max-w-3xl bg-surface-container-lowest rounded-xl shadow-2xl border border-outline-variant flex flex-col max-h-[921px] animate-slide-up overflow-hidden">
+<!-- Modal Header -->
+<div class="px-xl py-lg border-b border-outline-variant flex items-center justify-between bg-surface">
+<div>
+<h2 class="font-h3 text-h3 text-on-surface">Create New Task</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Set details and milestones for the project</p>
+</div>
+<button class="p-xs rounded-full hover:bg-surface-container-high transition-colors" onclick="document.getElementById('taskModal').classList.add('hidden')">
+<span class="material-symbols-outlined text-outline">close</span>
+</button>
+</div>
+<!-- Modal Form Scroll Area -->
+<div class="flex-1 overflow-y-auto px-xl py-lg space-y-lg">
+<!-- Main Fields -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Task Title</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all" placeholder="e.g., Q4 Financial Audit Preparation" type="text"/>
+</div>
+<div class="md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Description</label>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all resize-none" placeholder="Detail the core requirements and goals of this task..." rows="4"></textarea>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Priority</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all pr-xl">
+<option>Low</option>
+<option selected="">Medium</option>
+<option>High</option>
+<option>Urgent</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-outline text-body-lg">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Assignee</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all pr-xl">
+<option>Select team member</option>
+<option>Aditi Sharma</option>
+<option>Rohan Gupta</option>
+<option>Priya Verma</option>
+<option>Vikram Singh</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-outline text-body-lg">person_add</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Department</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all pr-xl">
+<option>Product Development</option>
+<option>Marketing</option>
+<option>Finance</option>
+<option>Operations</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-outline text-body-lg">business_center</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Due Date</label>
+<div class="relative">
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all" type="date"/>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-outline text-body-lg">calendar_today</span>
+</div>
+</div>
+</div>
+<!-- Milestones Section -->
+<div class="pt-md border-t border-outline-variant">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-label-md text-label-md text-on-surface-variant flex items-center gap-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+                            Milestones
+                        </h3>
+<button class="text-primary font-label-md text-label-md flex items-center gap-xs hover:underline decoration-2 underline-offset-4" id="addMilestone">
+<span class="material-symbols-outlined text-body-md">add_circle</span>
+                            Add Row
+                        </button>
+</div>
+<div class="space-y-sm" id="milestoneContainer">
+<!-- Milestone Row -->
+<div class="grid grid-cols-[1fr_180px_40px] gap-sm items-center bg-surface-container-low p-sm rounded-lg border border-outline-variant/30">
+<input class="bg-transparent border-none focus:ring-0 font-body-md w-full px-sm py-xs" placeholder="Milestone name" type="text" value="Initial Draft Completion"/>
+<input class="bg-transparent border-none focus:ring-0 font-body-sm text-on-surface-variant px-sm py-xs" type="date"/>
+<button class="text-error opacity-60 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<!-- Milestone Row -->
+<div class="grid grid-cols-[1fr_180px_40px] gap-sm items-center bg-surface-container-low p-sm rounded-lg border border-outline-variant/30">
+<input class="bg-transparent border-none focus:ring-0 font-body-md w-full px-sm py-xs" placeholder="Milestone name" type="text" value="Stakeholder Review"/>
+<input class="bg-transparent border-none focus:ring-0 font-body-sm text-on-surface-variant px-sm py-xs" type="date"/>
+<button class="text-error opacity-60 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-xl py-lg border-t border-outline-variant flex items-center justify-end gap-md bg-surface">
+<button class="px-lg py-sm rounded-lg border border-outline-variant text-primary font-label-md text-label-md hover:bg-surface-container-low transition-all" onclick="document.getElementById('taskModal').classList.add('hidden')">
+                    Cancel
+                </button>
+<button class="px-xl py-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-md hover:scale-[1.02] active:scale-95 transition-all">
+                    Create Task
+                </button>
+</div>
+</div>
+</div>
+<script>
+        // Micro-interaction for adding milestone rows
+        const milestoneContainer = document.getElementById('milestoneContainer');
+        const addBtn = document.getElementById('addMilestone');
+
+        addBtn.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'grid grid-cols-[1fr_180px_40px] gap-sm items-center bg-surface-container-low p-sm rounded-lg border border-outline-variant/30 animate-fade-in';
+            row.innerHTML = `
+                <input type="text" placeholder="Milestone name" class="bg-transparent border-none focus:ring-0 font-body-md w-full px-sm py-xs">
+                <input type="date" class="bg-transparent border-none focus:ring-0 font-body-sm text-on-surface-variant px-sm py-xs">
+                <button class="text-error opacity-60 hover:opacity-100 transition-opacity" onclick="this.parentElement.remove()">
+                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                </button>
+            `;
+            milestoneContainer.appendChild(row);
+        });
+
+        // Simple ESC key listener to close modal
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('taskModal').classList.add('hidden');
+            }
+        });
+    </script>
+</body></html>

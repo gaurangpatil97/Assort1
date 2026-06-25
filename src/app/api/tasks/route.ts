@@ -10,8 +10,7 @@ function getTaskScope(user: { id: string; companyId: string; departmentId: strin
     return { companyId: user.companyId };
   }
   if (user.baseLevel === 'MANAGER') {
-    // Note: the spec says "MANAGER -> all tasks in their department only"
-    return { companyId: user.companyId, departmentId: user.departmentId };
+    return { companyId: user.companyId };
   }
   return { companyId: user.companyId, assigneeId: user.id };
 }
