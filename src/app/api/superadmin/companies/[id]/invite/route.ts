@@ -57,13 +57,20 @@ export async function POST(
     })
 
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'localhost',
-      port: Number(process.env.SMTP_PORT) || 2525,
-      auth: { user: process.env.SMTP_USER || 'user', pass: process.env.SMTP_PASS || 'pass' },
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
     })
     try {
       await transporter.sendMail({
-        from: '"Assort1" <noreply@assort1.com>',
+        from: `"Assort1" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
         to: result.email,
         subject: 'You have been invited to Assort1',
         text: `Hello ${result.name}, you have been invited to join ${company.name} on Assort1. Use this token to register: ${result.token}`,

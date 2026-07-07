@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function InviteUserModal({ onClose, onSuccess }: Props) {
-  const [form, setForm] = useState({ email: '', name: '', baseLevel: 'MEMBER', departmentId: '', managerId: '' });
+  const [form, setForm] = useState({ email: '', name: '', baseLevel: 'MEMBER', departmentId: '', managerId: '', designation: '' });
   const [departments, setDepartments] = useState<any[]>([]);
   const [managers, setManagers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -23,16 +23,21 @@ export default function InviteUserModal({ onClose, onSuccess }: Props) {
     setLoading(true);
     setError('');
     try {
-      const body: any = { email: form.email, name: form.name, baseLevel: form.baseLevel };
+      const body: any = {
+        email: form.email,
+        name: form.name,
+        baseLevel: form.baseLevel,
+      };
       if (form.departmentId) body.departmentId = form.departmentId;
       if (form.managerId) body.managerId = form.managerId;
-      const res = await fetch('/api/invites', {
+      if (form.designation) body.designation = form.designation;
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send invite');
+      if (!res.ok) throw new Error(data.error || 'Failed to add user');
       onSuccess();
     } catch (e: any) {
       setError(e.message);
@@ -45,7 +50,7 @@ export default function InviteUserModal({ onClose, onSuccess }: Props) {
     <div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:9999}}>
       <div style={{backgroundColor:'white',borderRadius:'12px',boxShadow:'0 20px 60px rgba(0,0,0,0.3)',width:'100%',maxWidth:'480px',margin:'0 16px',maxHeight:'90vh',overflowY:'auto'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'20px 24px',borderBottom:'1px solid #c3c6d7'}}>
-          <h3 style={{fontSize:'18px',fontWeight:700,color:'#131b2e',margin:0}}>Invite User</h3>
+          <h3 style={{fontSize:'18px',fontWeight:700,color:'#131b2e',margin:0}}>Add User</h3>
           <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',color:'#434655'}}>
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
           </button>
@@ -73,6 +78,11 @@ export default function InviteUserModal({ onClose, onSuccess }: Props) {
             </select>
           </div>
           <div>
+            <label style={{display:'block',fontSize:'14px',fontWeight:600,color:'#131b2e',marginBottom:'4px'}}>Designation <span style={{color:'#434655',fontWeight:400}}>(Optional)</span></label>
+            <input type="text" value={form.designation || ''} onChange={e => setForm({...form, designation: e.target.value})} placeholder="e.g. Senior Engineer, Team Lead, Analyst"
+              style={{width:'100%',padding:'8px 12px',backgroundColor:'#f2f3ff',border:'1px solid #c3c6d7',borderRadius:'8px',fontSize:'14px',outline:'none',boxSizing:'border-box'}} />
+          </div>
+          <div>
             <label style={{display:'block',fontSize:'14px',fontWeight:600,color:'#131b2e',marginBottom:'4px'}}>Department</label>
             <select value={form.departmentId} onChange={e => setForm({...form, departmentId: e.target.value})}
               style={{width:'100%',padding:'8px 12px',backgroundColor:'#f2f3ff',border:'1px solid #c3c6d7',borderRadius:'8px',fontSize:'14px',outline:'none',boxSizing:'border-box',cursor:'pointer'}}>
@@ -95,7 +105,7 @@ export default function InviteUserModal({ onClose, onSuccess }: Props) {
               Cancel
             </button>
             <button onClick={handleInvite} disabled={loading || !form.email || !form.name} style={{padding:'10px 16px',borderRadius:'8px',border:'none',backgroundColor:'#2563EB',color:'white',fontSize:'14px',fontWeight:500,cursor:'pointer',opacity:(loading||!form.email||!form.name)?0.6:1}}>
-              {loading ? 'Sending...' : 'Send Invite'}
+              {loading ? 'Sending...' : 'Add User'}
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { isSuperadmin } from '../helper';
 import { z } from 'zod';
 import { seedNewCompany } from '@/lib/company-seed';
 import nodemailer from 'nodemailer';
-import { CompanyStatus, EntityType, InviteStatus } from '@prisma/client';
+import { CompanyStatus, EntityType } from '@prisma/client';
 
 export async function GET(request: Request) {
   const adminCheck = await isSuperadmin(request);
@@ -83,15 +83,21 @@ export async function POST(request: Request) {
         throw new Error('Admin role not generated');
       }
 
-      // 4. Create invite and audit log in transaction
-      const newInvite = await tx.invite.create({
+      // 4. Create user and audit log in transaction
+      const { hashPassword } = await import('@/lib/password');
+      const emailPrefix = adminEmail.split('@')[0];
+      const tempPassword = `${emailPrefix}@123`;
+      const passwordHash = await hashPassword(tempPassword);
+
+      const newAdmin = await tx.user.create({
         data: {
           companyId: company.id,
           roleId: adminRole.id,
-          email: adminEmail,
           name: adminName,
-          status: InviteStatus.PENDING,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          email: adminEmail,
+          passwordHash,
+          baseLevel: 'ADMIN',
+          status: 'ACTIVE',
         },
       });
 
@@ -104,27 +110,46 @@ export async function POST(request: Request) {
         },
       });
 
-      return { company, invite: newInvite };
+      return { company, admin: newAdmin, tempPassword };
     }, { timeout: 30000 });
     
-    const { company, invite } = result;
+    const { company, admin, tempPassword } = result;
 
     // 5. Send Email
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'localhost',
-      port: Number(process.env.SMTP_PORT) || 2525,
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false,
       auth: {
-        user: process.env.SMTP_USER || 'user',
-        pass: process.env.SMTP_PASS || 'pass',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
     try {
       await transporter.sendMail({
-        from: '"Assort1" <noreply@assort1.com>',
-        to: invite.email,
-        subject: 'Welcome to Assort1 - You are invited!',
-        text: `Hello ${invite.name}, your company ${company.name} has been created. Use this token to join: ${invite.token}`,
+        from: `"Assort1" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        to: admin.email,
+        subject: 'Welcome to Assort1 - Your account is ready',
+        html: `
+          <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #faf8ff; border-radius: 12px;">
+            <h2 style="color: #131b2e; margin-bottom: 8px;">Welcome to Assort1, ${admin.name}!</h2>
+            <p style="color: #434655; margin-bottom: 24px;">Your company <strong>${company.name}</strong> has been set up on Assort1. Here are your admin login credentials:</p>
+            <div style="background: white; border: 1px solid #c3c6d7; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+              <p style="margin: 0 0 8px; color: #434655; font-size: 14px;"><strong>Email:</strong> ${admin.email}</p>
+              <p style="margin: 0 0 8px; color: #434655; font-size: 14px;"><strong>Password:</strong> ${tempPassword}</p>
+              <p style="margin: 0; color: #434655; font-size: 14px;"><strong>Role:</strong> Company Admin</p>
+            </div>
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login"
+              style="display: inline-block; background: #2563EB; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+              Login to Assort1
+            </a>
+            <p style="color: #434655; font-size: 12px; margin-top: 24px;">Please change your password after first login.</p>
+          </div>
+        `,
       });
     } catch (e) {
       console.error('Failed to send email', e);

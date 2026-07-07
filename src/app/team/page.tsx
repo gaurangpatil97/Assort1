@@ -43,7 +43,7 @@ export default function TeamPage() {
                 </thead>
                 <tbody className="divide-y divide-outline-variant">
                   {team.map(member => (
-                    <tr key={member.id} className="hover:bg-surface-container-low transition-colors group">
+                    <tr key={member.id || member.email || Math.random()} className="hover:bg-surface-container-low transition-colors group">
                       <td className="px-lg py-md">
                         <Link href={`/profile/${member.id}`} className="flex items-center gap-md group-hover:text-primary transition-colors">
                            <div className="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold shadow-sm">

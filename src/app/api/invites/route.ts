@@ -97,17 +97,21 @@ export async function POST(request: Request) {
     });
 
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'localhost',
-      port: Number(process.env.SMTP_PORT) || 2525,
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false,
       auth: {
-        user: process.env.SMTP_USER || 'user',
-        pass: process.env.SMTP_PASS || 'pass',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
     try {
       await transporter.sendMail({
-        from: '"Assort1" <noreply@assort1.com>',
+        from: `"Assort1" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
         to: invite.email,
         subject: 'Welcome to Assort1 - You are invited!',
         text: `Hello ${invite.name || ''}, you have been invited. Use this token to join: ${invite.token}`,
