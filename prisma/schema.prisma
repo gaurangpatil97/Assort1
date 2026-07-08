@@ -442,6 +442,8 @@ model TaskComment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  attachments TaskAttachment[]
+
   @@map("task_comments")
 }
 
@@ -450,9 +452,11 @@ model TaskComment {
 // ─────────────────────────────────────────────
 
 model TaskAttachment {
-  id           String   @id @default(cuid())
+  id           String       @id @default(cuid())
   taskId       String
-  task         Task     @relation(fields: [taskId], references: [id])
+  task         Task         @relation(fields: [taskId], references: [id])
+  commentId    String?
+  comment      TaskComment? @relation(fields: [commentId], references: [id])
   uploadedById String
   uploadedBy   User     @relation("TaskAttachmentUploader", fields: [uploadedById], references: [id])
   fileName     String

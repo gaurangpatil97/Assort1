@@ -21,6 +21,7 @@ export default function TaskDetailPage() {
   const [milestoneError, setMilestoneError] = useState('');
   const [submitModal, setSubmitModal] = useState<{ open: boolean, milestoneId: string, milestoneName: string }>({ open: false, milestoneId: '', milestoneName: '' });
   const [submitNote, setSubmitNote] = useState('');
+  const [submitFiles, setSubmitFiles] = useState<File[]>([]);
   const [submittingNote, setSubmittingNote] = useState(false);
   const [rejectModal, setRejectModal] = useState<{ open: boolean, milestoneId: string }>({ open: false, milestoneId: '' });
   const [rejectDeadline, setRejectDeadline] = useState('');
@@ -42,15 +43,26 @@ export default function TaskDetailPage() {
 
   useEffect(() => { fetchTask(); fetchComments(); }, [id]);
 
+  const [commentFiles, setCommentFiles] = useState<File[]>([]);
+
   const handleComment = async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() && commentFiles.length === 0) return;
     setSubmittingComment(true);
     try {
+      const formData = new FormData();
+      if (newComment.trim()) {
+        formData.append('content', newComment);
+      }
+      commentFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
       await fetch(`/api/tasks/${id}/comments`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newComment })
+        method: 'POST',
+        body: formData,
       });
       setNewComment('');
+      setCommentFiles([]);
       fetchComments();
     } finally { setSubmittingComment(false); }
   };
@@ -73,11 +85,20 @@ export default function TaskDetailPage() {
   const handleSubmitMilestone = async () => {
     setSubmittingNote(true);
     try {
+      const formData = new FormData();
+      if (submitNote.trim()) formData.append('note', submitNote);
+      submitFiles.forEach(file => formData.append('files', file));
+
       const res = await fetch(`/api/tasks/${id}/milestones/${submitModal.milestoneId}/submit`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ note: submitNote })
+        method: 'POST',
+        body: formData,
       });
-      if (res.ok) { setSubmitModal({ open: false, milestoneId: '', milestoneName: '' }); setSubmitNote(''); fetchTask(); }
+      if (res.ok) { 
+        setSubmitModal({ open: false, milestoneId: '', milestoneName: '' }); 
+        setSubmitNote(''); 
+        setSubmitFiles([]);
+        fetchTask(); 
+      }
     } finally { setSubmittingNote(false); }
   };
 
@@ -96,6 +117,20 @@ export default function TaskDetailPage() {
         fetchTask();
       }
     } finally { setSubmittingReview(false); }
+  };
+
+  const handleDownloadAttachment = async (url: string) => {
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (res.ok && data.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      } else {
+        alert(data.error || 'Failed to download attachment');
+      }
+    } catch (e: any) {
+      alert('Error downloading attachment');
+    }
   };
 
   const handleArchive = async () => {
@@ -217,6 +252,16 @@ export default function TaskDetailPage() {
                             <strong>Submission Note:</strong> {m.submissions[0].note}
                           </div>
                         )}
+                        {m.submissions?.[0]?.attachments?.length > 0 && (
+                          <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'8px'}}>
+                            {m.submissions[0].attachments.map((att: any) => (
+                              <button key={att.id} onClick={() => handleDownloadAttachment(`/api/tasks/${id}/milestones/${m.id}/attachments/${att.id}/download`)} style={{padding:'4px 10px',border:'1px solid #c3c6d7',backgroundColor:'white',borderRadius:'16px',fontSize:'12px',display:'flex',alignItems:'center',gap:'6px',color:'#131b2e',cursor:'pointer'}}>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-370h60v370q0 21 14.5 35.5T470-300q21 0 35.5-14.5T520-350v-350q0-50-35-85t-85-35q-50 0-85 35t-35 85v370q0 79 55.5 134.5T470-140q79 0 134.5-55.5T660-330v-370h60v370Z"/></svg>
+                                <span style={{maxWidth:'150px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{att.fileName}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                         {m.status === 'REJECTED' && m.rejectionNote && (
                           <div style={{fontSize:'12px',color:'#7f1d1d',marginTop:'8px',padding:'8px',backgroundColor:'#fef2f2',borderRadius:'4px',border:'1px solid #fecaca'}}>
                             <strong>Rejection Note:</strong> {m.rejectionNote}
@@ -265,19 +310,55 @@ export default function TaskDetailPage() {
                         <span style={{fontSize:'13px',fontWeight:600,color:'#131b2e'}}>{c.user?.name}</span>
                         <span style={{fontSize:'11px',color:'#434655'}}>{timeAgo(c.createdAt)}</span>
                       </div>
-                      <p style={{margin:0,fontSize:'14px',color:'#434655',lineHeight:'1.5'}}>{c.content}</p>
+                      {c.content && <p style={{margin:0,fontSize:'14px',color:'#434655',lineHeight:'1.5'}}>{c.content}</p>}
+                      {c.attachments?.length > 0 && (
+                        <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'8px'}}>
+                          {c.attachments.map((att: any) => (
+                            <button key={att.id} onClick={() => handleDownloadAttachment(`/api/tasks/${id}/attachments/${att.id}/download`)} style={{padding:'4px 10px',border:'1px solid #c3c6d7',backgroundColor:'#f8fafc',borderRadius:'16px',fontSize:'12px',display:'flex',alignItems:'center',gap:'6px',color:'#131b2e',cursor:'pointer'}}>
+                              <svg xmlns="http://www.w3.org/2000/svg" height="14" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-370h60v370q0 21 14.5 35.5T470-300q21 0 35.5-14.5T520-350v-350q0-50-35-85t-85-35q-50 0-85 35t-35 85v370q0 79 55.5 134.5T470-140q79 0 134.5-55.5T660-330v-370h60v370Z"/></svg>
+                              <span style={{maxWidth:'150px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{att.fileName}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
-              <div style={{display:'flex',gap:'12px',alignItems:'flex-end'}}>
-                <textarea value={newComment} onChange={e => setNewComment(e.target.value)}
-                  placeholder="Write a comment..." rows={2}
-                  style={{flex:1,padding:'8px 12px',border:'1px solid #c3c6d7',borderRadius:'8px',fontSize:'14px',outline:'none',resize:'none'}} />
-                <button onClick={handleComment} disabled={submittingComment || !newComment.trim()}
-                  style={{padding:'8px 20px',backgroundColor:'#2563EB',color:'white',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:500,cursor:'pointer',opacity:(!newComment.trim()||submittingComment)?0.6:1}}>
-                  Send
-                </button>
+              <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+                <div style={{display:'flex',gap:'12px',alignItems:'flex-end'}}>
+                  <textarea value={newComment} onChange={e => setNewComment(e.target.value)}
+                    placeholder="Write a comment..." rows={2}
+                    style={{flex:1,padding:'8px 12px',border:'1px solid #c3c6d7',borderRadius:'8px',fontSize:'14px',outline:'none',resize:'none'}} />
+                  <button onClick={handleComment} disabled={submittingComment || (!newComment.trim() && commentFiles.length === 0)}
+                    style={{padding:'8px 20px',backgroundColor:'#2563EB',color:'white',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:500,cursor:'pointer',opacity:((!newComment.trim() && commentFiles.length === 0)||submittingComment)?0.6:1}}>
+                    Send
+                  </button>
+                </div>
+                <div>
+                  <label style={{display:'inline-flex',alignItems:'center',gap:'4px',cursor:'pointer',color:'#434655',fontSize:'13px'}}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor"><path d="M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-370h60v370q0 21 14.5 35.5T470-300q21 0 35.5-14.5T520-350v-350q0-50-35-85t-85-35q-50 0-85 35t-35 85v370q0 79 55.5 134.5T470-140q79 0 134.5-55.5T660-330v-370h60v370Z"/></svg>
+                    Attach Files
+                    <input type="file" multiple accept="image/*,application/pdf,.doc,.docx" style={{display:'none'}} onChange={(e) => {
+                      if (e.target.files) {
+                        const newFiles = Array.from(e.target.files);
+                        const totalFiles = [...commentFiles, ...newFiles];
+                        if (totalFiles.length > 5) alert('Maximum 5 files allowed');
+                        else setCommentFiles(totalFiles);
+                      }
+                    }} />
+                  </label>
+                  {commentFiles.length > 0 && (
+                    <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'8px'}}>
+                      {commentFiles.map((f, i) => (
+                        <div key={i} style={{padding:'4px 10px',border:'1px solid #c3c6d7',backgroundColor:'#f8fafc',borderRadius:'16px',fontSize:'12px',display:'flex',alignItems:'center',gap:'6px'}}>
+                          <span style={{maxWidth:'150px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</span>
+                          <button onClick={() => setCommentFiles(commentFiles.filter((_, idx) => idx !== i))} style={{background:'none',border:'none',cursor:'pointer',padding:0,color:'#dc2626'}}>x</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -348,6 +429,30 @@ export default function TaskDetailPage() {
                 <textarea value={submitNote} onChange={e => setSubmitNote(e.target.value)} rows={4}
                   placeholder="Add details about your submission, challenges faced, or key changes made..."
                   style={{width:'100%',padding:'8px 12px',border:'1px solid #c3c6d7',borderRadius:'8px',fontSize:'14px',outline:'none',resize:'vertical',boxSizing:'border-box'}} />
+              </div>
+              <div>
+                <label style={{display:'inline-flex',alignItems:'center',gap:'4px',cursor:'pointer',color:'#434655',fontSize:'13px'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor"><path d="M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-370h60v370q0 21 14.5 35.5T470-300q21 0 35.5-14.5T520-350v-350q0-50-35-85t-85-35q-50 0-85 35t-35 85v370q0 79 55.5 134.5T470-140q79 0 134.5-55.5T660-330v-370h60v370Z"/></svg>
+                  Attach Files
+                  <input type="file" multiple accept="image/*,application/pdf,.doc,.docx" style={{display:'none'}} onChange={(e) => {
+                    if (e.target.files) {
+                      const newFiles = Array.from(e.target.files);
+                      const totalFiles = [...submitFiles, ...newFiles];
+                      if (totalFiles.length > 5) alert('Maximum 5 files allowed');
+                      else setSubmitFiles(totalFiles);
+                    }
+                  }} />
+                </label>
+                {submitFiles.length > 0 && (
+                  <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginTop:'8px'}}>
+                    {submitFiles.map((f, i) => (
+                      <div key={i} style={{padding:'4px 10px',border:'1px solid #c3c6d7',backgroundColor:'#f8fafc',borderRadius:'16px',fontSize:'12px',display:'flex',alignItems:'center',gap:'6px'}}>
+                        <span style={{maxWidth:'150px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</span>
+                        <button onClick={() => setSubmitFiles(submitFiles.filter((_, idx) => idx !== i))} style={{background:'none',border:'none',cursor:'pointer',padding:0,color:'#dc2626'}}>x</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div style={{display:'flex',justifyContent:'flex-end',gap:'12px'}}>
                 <button onClick={() => setSubmitModal({ open:false, milestoneId:'', milestoneName:'' })}

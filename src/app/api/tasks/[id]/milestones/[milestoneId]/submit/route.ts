@@ -39,9 +39,47 @@ export async function POST(
       return NextResponse.json({ error: 'Milestone cannot be submitted in its current state' }, { status: 400 });
     }
 
-    const body = await request.json().catch(() => ({}));
-    const parsed = submitSchema.safeParse(body);
-    const note = parsed.success ? parsed.data.note : undefined;
+    const formData = await request.formData();
+    const note = formData.get('note') as string | undefined;
+
+    const files: File[] = [];
+    for (const [key, value] of formData.entries()) {
+      if (key === 'files' && value instanceof File) {
+        files.push(value);
+      }
+    }
+
+    if (files.length > 5) {
+      return NextResponse.json({ error: 'Maximum 5 files allowed' }, { status: 400 });
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) {
+        return NextResponse.json({ error: `File ${file.name} exceeds 10MB limit` }, { status: 400 });
+      }
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json({ error: `File type ${file.type} not allowed` }, { status: 400 });
+      }
+    }
+
+    // Upload files to Supabase
+    const { uploadFile } = await import('@/lib/supabase');
+    const uploadedAttachments: { fileName: string; fileType: string; fileSize: number; storageKey: string }[] = [];
+    for (const file of files) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const uniqueName = `${companyId}/tasks/${taskId}/milestones/${milestoneId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+      const { path, error } = await uploadFile(buffer, uniqueName, file.type);
+      if (error || !path) {
+        return NextResponse.json({ error: `Failed to upload file ${file.name}` }, { status: 500 });
+      }
+      uploadedAttachments.push({
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        storageKey: path,
+      });
+    }
 
     const now = new Date();
 
@@ -55,13 +93,26 @@ export async function POST(
         },
       });
 
-      await tx.milestoneSubmission.create({
+      const submission = await tx.milestoneSubmission.create({
         data: {
           milestoneId,
           submittedById: userId,
           note: note || null,
         },
       });
+
+      if (uploadedAttachments.length > 0) {
+        await tx.milestoneAttachment.createMany({
+          data: uploadedAttachments.map(att => ({
+            submissionId: submission.id,
+            uploadedById: userId,
+            fileName: att.fileName,
+            mimeType: att.fileType,
+            fileSize: att.fileSize,
+            storageKey: att.storageKey,
+          })),
+        });
+      }
 
       if (task.createdById !== userId) {
         await tx.notification.create({

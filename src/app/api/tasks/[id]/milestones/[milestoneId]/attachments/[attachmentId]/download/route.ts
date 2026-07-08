@@ -3,28 +3,24 @@ import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/app/api/helper';
 import { generateSignedUrl } from '@/lib/supabase';
 
-export async function GET(request: Request, props: { params: Promise<{ id: string; attachmentId: string }> }) {
-  const params = await props.params;
-  const taskId = params.id;
-  const attachmentId = params.attachmentId;
-
+export async function GET(
+  request: Request,
+  props: { params: Promise<{ id: string; milestoneId: string; attachmentId: string }> }
+) {
   const userOrResponse = await getAuthUser(request);
   if (userOrResponse instanceof NextResponse) return userOrResponse;
-
   const { id: userId, companyId, baseLevel, departmentId } = userOrResponse;
 
+  const params = await props.params;
+  const { id: taskId, milestoneId, attachmentId } = params;
+
   try {
-    const attachment = await prisma.taskAttachment.findUnique({
-      where: { id: attachmentId },
-      include: { task: true },
+    const task = await prisma.task.findUnique({
+      where: { id: taskId, companyId },
     });
 
-    if (!attachment || attachment.task.companyId !== companyId || attachment.taskId !== taskId) {
-      return NextResponse.json({ error: 'Attachment not found' }, { status: 404 });
-    }
+    if (!task) return NextResponse.json({ error: 'Task not found' }, { status: 404 });
 
-    // Verify visibility
-    const task = attachment.task;
     const isParticipant = task.assigneeId === userId || task.createdById === userId;
     if (!isParticipant) {
       if (baseLevel === 'MANAGER' && task.departmentId !== departmentId) {
@@ -33,6 +29,17 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
       if (baseLevel === 'MEMBER' || baseLevel === 'VIEWER') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
+    }
+
+    const attachment = await prisma.milestoneAttachment.findUnique({
+      where: { id: attachmentId },
+      include: {
+        submission: true,
+      },
+    });
+
+    if (!attachment || attachment.submission.milestoneId !== milestoneId) {
+      return NextResponse.json({ error: 'Attachment not found' }, { status: 404 });
     }
 
     const signedUrl = await generateSignedUrl(attachment.storageKey, 60);
@@ -47,7 +54,7 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
       mimeType: attachment.mimeType,
     });
   } catch (error) {
-    console.error('Task attachment download GET error:', error);
+    console.error('Milestone attachment download GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
