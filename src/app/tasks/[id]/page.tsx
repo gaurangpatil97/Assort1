@@ -209,7 +209,7 @@ export default function TaskDetailPage() {
                       <div style={{flex:1}}>
                         <div style={{fontSize:'14px',fontWeight:500,color:'#131b2e'}}>{m.name}</div>
                         <div style={{fontSize:'12px',color:'#434655',marginTop:'2px'}}>
-                          Due: {new Date(m.dueDate).toLocaleDateString()}
+                          Due: {m.newDeadline ? new Date(m.newDeadline).toLocaleDateString() : new Date(m.dueDate).toLocaleDateString()}
                           {m.isOverdue && <span style={{color:'#e11d48',marginLeft:'8px',fontWeight:600}}>Overdue</span>}
                         </div>
                         {m.submissions?.[0]?.note && (
@@ -217,10 +217,15 @@ export default function TaskDetailPage() {
                             <strong>Submission Note:</strong> {m.submissions[0].note}
                           </div>
                         )}
+                        {m.status === 'REJECTED' && m.rejectionNote && (
+                          <div style={{fontSize:'12px',color:'#7f1d1d',marginTop:'8px',padding:'8px',backgroundColor:'#fef2f2',borderRadius:'4px',border:'1px solid #fecaca'}}>
+                            <strong>Rejection Note:</strong> {m.rejectionNote}
+                          </div>
+                        )}
                       </div>
                       <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                         <span style={{...milestoneStatusStyle(m.status),padding:'3px 10px',borderRadius:'999px',fontSize:'11px',fontWeight:600}}>{m.status}</span>
-                        {m.status === 'NOT_STARTED' && task.assigneeId === user?.id && (
+                        {(m.status === 'NOT_STARTED' || m.status === 'REJECTED') && task.assigneeId === user?.id && (
                           <button onClick={() => setSubmitModal({ open: true, milestoneId: m.id, milestoneName: m.name })}
                             style={{padding:'6px 14px',backgroundColor:'#2563EB',color:'white',border:'none',borderRadius:'8px',fontSize:'12px',cursor:'pointer'}}>
                             Submit

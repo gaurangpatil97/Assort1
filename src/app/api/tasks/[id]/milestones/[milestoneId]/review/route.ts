@@ -99,6 +99,7 @@ export async function POST(
             status: MilestoneStatus.REJECTED,
             rejectedAt: now,
             newDeadline: newDeadline ? new Date(newDeadline) : undefined,
+            rejectionNote: note || null,
           },
         });
 
